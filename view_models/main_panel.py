@@ -1,6 +1,7 @@
 import customtkinter
 from tkinter import CENTER
-from database.create_database import select_all_data, update_data, insert_data, delete_record
+from database.create_database import select_all_data
+from modules.main_panel_manager import AppManager
 
 
 class App(customtkinter.CTk):
@@ -13,20 +14,22 @@ class App(customtkinter.CTk):
         self.title("Organizer")
         customtkinter.set_appearance_mode("dark")
         customtkinter.set_default_color_theme("blue")
+        self.data_manager = AppManager(self)
+
 
         # All data
         self.current_id = None
         self.tasks = select_all_data()
-        self.ids = self.all_id(self.tasks)
-        self.titles = self.all_titles(self.tasks)
-        self.descriptions = self.all_descriptions(self.tasks)
-        self.deadlines = self.all_deadlines(self.tasks)
-        self.completed = self.all_compleded(self.tasks)
+        self.ids = all_id(self.tasks)
+        self.titles = all_titles(self.tasks)
+        self.descriptions = all_descriptions(self.tasks)
+        self.deadlines = all_deadlines(self.tasks)
+        self.completed = all_compleded(self.tasks)
 
         # Left and right frame
         self.left_frame = customtkinter.CTkFrame(
             self,
-            width=width / 2 - 20,
+            width=680,
             height=height - 20,
             fg_color="black",
             corner_radius=20
@@ -41,7 +44,7 @@ class App(customtkinter.CTk):
 
         self.right_frame = customtkinter.CTkFrame(
             self,
-            width=width / 2 - 20,
+            width=680,
             height=height - 20,
             fg_color="black",
             corner_radius=20
@@ -61,7 +64,6 @@ class App(customtkinter.CTk):
             width=300
         )
 
-        # self.left_option_menu.set(titles[0].title)
         self.left_option_menu.place(
             x=20,
             y=20
@@ -139,7 +141,7 @@ class App(customtkinter.CTk):
 
         self.left_textbox = customtkinter.CTkTextbox(
             self,
-            width=width / 2 - 40,
+            width=660,
             height=470
         )
         self.left_textbox.place(
@@ -151,7 +153,7 @@ class App(customtkinter.CTk):
             self,
             width=250,
             text="Update",
-            command=lambda: self.update_data()
+            command=lambda: self.data_manager.update_data()
         )
 
         self.left_button_update.place(
@@ -164,7 +166,7 @@ class App(customtkinter.CTk):
             width=250,
             text="Delete",
             fg_color="red",
-            command=lambda: self.delete()
+            command=lambda: self.data_manager.delete()
         )
 
         self.left_button_delete.place(
@@ -190,7 +192,7 @@ class App(customtkinter.CTk):
 
         self.option_menu_var = customtkinter.StringVar()
         self.left_option_menu.configure(variable=self.option_menu_var)
-        self.option_menu_var.trace_add('write', self.update)
+        self.option_menu_var.trace_add('write', self.data_manager.update)
 
         self.right_title = customtkinter.CTkLabel(
             self,
@@ -248,7 +250,7 @@ class App(customtkinter.CTk):
 
         self.right_textbox = customtkinter.CTkTextbox(
             self,
-            width=width / 2 - 40,
+            width=660,
             height=540
         )
 
@@ -261,75 +263,10 @@ class App(customtkinter.CTk):
             self,
             width=350,
             text="Insert",
-            command=lambda: self.insert()
+            command=lambda: self.data_manager.insert()
         )
 
         self.left_button_delete.place(
             x=875,
             y=650
         )
-
-    def update(self, *args):
-        selected_option = self.option_menu_var.get()
-        self.current_id = self.get_task_by_title(selected_option, self.tasks)
-        self.left_entry.delete(0, customtkinter.END)
-        self.left_entry.insert(
-            index=0,
-            string=selected_option
-        )
-        self.left_textbox.delete('1.0', customtkinter.END)
-        self.left_textbox.insert('1.0', text=self.descriptions[self.ids.index(self.current_id)])
-        self.left_entry_date.delete(0, customtkinter.END)
-        self.left_entry_date.insert(0, self.deadlines[self.ids.index(self.current_id)])
-
-    def get_task_by_title(self, title, tasks):
-        for task in tasks:
-            if task.title == title:
-                return task.task_id
-
-        return None
-
-    def all_titles(self, tasks):
-        return [task.title for task in tasks]
-
-    def all_descriptions(self, tasks):
-        return [task.description for task in tasks]
-
-    def all_deadlines(self, tasks):
-        return [task.due_date for task in tasks]
-
-    def all_compleded(self, tasks):
-        return [task.completed for task in tasks]
-
-    def all_id(self, tasks):
-        return [task.task_id for task in tasks]
-
-    def update_all_attributes(self):
-        self.tasks = select_all_data()
-        self.tasks = select_all_data()
-        self.titles = self.all_titles(self.tasks)
-        self.descriptions = self.all_descriptions(self.tasks)
-        self.deadlines = self.all_deadlines(self.tasks)
-        self.completed = self.all_compleded(self.tasks)
-        self.ids = self.all_id(self.tasks)
-        self.left_option_menu.configure(values=[x for x in self.titles])
-
-    def update_data(self):
-        new_title = self.left_entry.get()
-        new_description = self.left_textbox.get('1.0', customtkinter.END).strip()
-        new_date = self.left_entry_date.get()
-        new_completed = True if self.left_checkbox.get() == 'True' else False
-        update_data(self.current_id, new_title, new_description, new_date, new_completed)
-        print(self.current_id)
-        self.update_all_attributes()
-
-    def insert(self):
-        title = self.right_entry.get()
-        description = self.right_textbox.get('1.0', customtkinter.END).strip()
-        deadline = self.right_entry_date.get()
-        insert_data(title, description, deadline)
-        self.update_all_attributes()
-
-    def delete(self):
-        delete_record(self.current_id )
-        self.update_all_attributes()
