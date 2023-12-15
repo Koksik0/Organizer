@@ -2,6 +2,7 @@ import customtkinter
 from tkinter import CENTER
 from database.create_database import select_all_data
 from modules.main_panel_manager import AppManager
+from modules.main_panel_manager import all_id, all_descriptions, all_titles, all_deadlines, all_completed
 
 
 class App(customtkinter.CTk):
@@ -16,7 +17,6 @@ class App(customtkinter.CTk):
         customtkinter.set_default_color_theme("blue")
         self.data_manager = AppManager(self)
 
-
         # All data
         self.current_id = None
         self.tasks = select_all_data()
@@ -24,7 +24,7 @@ class App(customtkinter.CTk):
         self.titles = all_titles(self.tasks)
         self.descriptions = all_descriptions(self.tasks)
         self.deadlines = all_deadlines(self.tasks)
-        self.completed = all_compleded(self.tasks)
+        self.completed = all_completed(self.tasks)
 
         # Left and right frame
         self.left_frame = customtkinter.CTkFrame(

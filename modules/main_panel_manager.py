@@ -45,7 +45,7 @@ class AppManager:
 
     def update(self, *args):
         selected_option = self.master.option_menu_var.get()
-        self.current_id = self.master.data_manager.get_task_by_title(selected_option, self.master.tasks)
+        self.current_id = get_task_by_title(selected_option, self.master.tasks)
         self.master.left_entry.delete(0, customtkinter.END)
         self.master.left_entry.insert(
             index=0,
