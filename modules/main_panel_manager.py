@@ -1,7 +1,10 @@
+from datetime import datetime
+
 import customtkinter
 
 from database.create_database import select_all_data, update_data, insert_data, delete_record
 
+from view_models.message_panel import MessagePanel
 
 def get_task_by_title(title, tasks):
     for task in tasks:
@@ -45,18 +48,18 @@ class AppManager:
 
     def update(self, *args):
         selected_option = self.master.option_menu_var.get()
-        self.current_id = get_task_by_title(selected_option, self.master.tasks)
+        self.master.current_id = get_task_by_title(selected_option, self.master.tasks)
         self.master.left_entry.delete(0, customtkinter.END)
         self.master.left_entry.insert(
             index=0,
             string=selected_option
         )
         self.master.left_textbox.delete('1.0', customtkinter.END)
-        self.master.left_textbox.insert('1.0', text=self.master.descriptions[self.master.ids.index(self.current_id)])
+        self.master.left_textbox.insert('1.0', text=self.master.descriptions[self.master.ids.index(self.master.current_id)])
         self.master.left_entry_date.delete(0, customtkinter.END)
-        self.master.left_entry_date.insert(0, self.master.deadlines[self.master.ids.index(self.current_id)])
+        self.master.left_entry_date.insert(0, self.master.deadlines[self.master.ids.index(self.master.current_id)])
 
-        if self.master.completed[self.master.ids.index(self.current_id)] == 1:
+        if self.master.completed[self.master.ids.index(self.master.current_id)] == 1:
             self.master.left_checkbox.select()
         else:
             self.master.left_checkbox.deselect()
@@ -69,19 +72,26 @@ class AppManager:
         new_description = self.master.left_textbox.get('1.0', customtkinter.END).strip()
         new_date = self.master.left_entry_date.get()
         new_completed = True if self.master.left_checkbox.get() == 'True' else False
-        update_data(self.current_id, new_title, new_description, new_date, new_completed)
+        update_data(self.master.current_id, new_title, new_description, new_date, new_completed)
         self.master.data_manager.update_all_attributes()
 
     def insert(self):
         title = self.master.right_entry.get()
         description = self.master.right_textbox.get('1.0', customtkinter.END).strip()
         deadline = self.master.right_entry_date.get()
-        insert_data(title, description, deadline)
-        self.master.data_manager.update_all_attributes()
+        try:
+            datetime.strptime(deadline, '%Y-%m-%d')
+            insert_data(title, description, deadline)
+            self.master.data_manager.update_all_attributes()
+        except ValueError:
+            MessagePanel('You have to enter correct data: YYYY-MM-DD', 500, 100, 'red')
 
     def delete(self):
-        delete_record(self.current_id)
-        self.master.data_manager.update_all_attributes()
+        if self.master.current_id is not None:
+            delete_record(self.master.current_id)
+            self.master.data_manager.update_all_attributes()
+        else:
+            MessagePanel('No field is selected', 500, 100, 'red')
 
     def search(self):
         self.update_all_attributes()
