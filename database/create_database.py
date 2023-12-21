@@ -32,11 +32,18 @@ def initialize_database():
         session.close()
 
 
-def select_all_data():
+def select_all_data(checkbox):
     Session = sessionmaker(bind=engine)
     session = Session()
     try:
-        tasks = session.query(Tasks).all()
+        tasks = None
+        if checkbox=="False":
+            checkbox = 0
+            tasks = session.query(Tasks).where(Tasks.completed == checkbox).order_by(Tasks.due_date)
+        else:
+            checkbox = 1
+            tasks = session.query(Tasks).where(Tasks.completed == checkbox).order_by(Tasks.due_date.desc())
+
         return tasks
     except Exception as e:
         print(f"Select error: {e}")
@@ -72,7 +79,6 @@ def update_data(task_id, new_title, new_description, new_date, new_completed):
     session = Session()
 
     try:
-        # Zaktualizuj dane w bazie danych
         session.execute(
             update(Tasks)
             .where(Tasks.task_id == task_id)
@@ -84,11 +90,9 @@ def update_data(task_id, new_title, new_description, new_date, new_completed):
             )
         )
         session.commit()
-
     except Exception as e:
         print(f"Błąd podczas aktualizacji danych: {e}")
         session.rollback()
-
     finally:
         session.close()
 

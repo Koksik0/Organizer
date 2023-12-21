@@ -35,7 +35,7 @@ class AppManager:
         self.master = master
 
     def update_all_attributes(self):
-        self.master.tasks = select_all_data()
+        self.master.tasks = select_all_data(self.master.left_checkbox_search.get())
         self.master.titles = all_titles(self.master.tasks)
         self.master.descriptions = all_descriptions(self.master.tasks)
         self.master.deadlines = all_deadlines(self.master.tasks)
@@ -55,6 +55,11 @@ class AppManager:
         self.master.left_textbox.insert('1.0', text=self.master.descriptions[self.master.ids.index(self.current_id)])
         self.master.left_entry_date.delete(0, customtkinter.END)
         self.master.left_entry_date.insert(0, self.master.deadlines[self.master.ids.index(self.current_id)])
+
+        if self.master.completed[self.master.ids.index(self.current_id)] == 1:
+            self.master.left_checkbox.select()
+        else:
+            self.master.left_checkbox.deselect()
 
     def update_menu(self, list_of_titles):
         self.master.left_option_menu.configure(values=[x for x in list_of_titles])
@@ -77,3 +82,6 @@ class AppManager:
     def delete(self):
         delete_record(self.current_id)
         self.master.data_manager.update_all_attributes()
+
+    def search(self):
+        self.update_all_attributes()

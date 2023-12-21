@@ -17,15 +17,6 @@ class App(customtkinter.CTk):
         customtkinter.set_default_color_theme("blue")
         self.data_manager = AppManager(self)
 
-        # All data
-        self.current_id = None
-        self.tasks = select_all_data()
-        self.ids = all_id(self.tasks)
-        self.titles = all_titles(self.tasks)
-        self.descriptions = all_descriptions(self.tasks)
-        self.deadlines = all_deadlines(self.tasks)
-        self.completed = all_completed(self.tasks)
-
         # Left and right frame
         self.left_frame = customtkinter.CTkFrame(
             self,
@@ -57,6 +48,27 @@ class App(customtkinter.CTk):
             pady=10
         )
 
+        check_var = customtkinter.StringVar(value="False")
+
+        self.left_checkbox_search = customtkinter.CTkCheckBox(
+            self,
+            text="Search completed",
+            variable=check_var,
+            onvalue="True",
+            offvalue="False",
+            bg_color="black",
+            command=lambda: self.data_manager.search()
+        )
+
+        # All data
+        self.current_id = None
+        self.tasks = select_all_data(self.left_checkbox_search.get())
+        self.ids = all_id(self.tasks)
+        self.titles = all_titles(self.tasks)
+        self.descriptions = all_descriptions(self.tasks)
+        self.deadlines = all_deadlines(self.tasks)
+        self.completed = all_completed(self.tasks)
+
         self.left_option_menu = customtkinter.CTkOptionMenu(
             self,
             values=[x for x in self.titles],
@@ -67,16 +79,6 @@ class App(customtkinter.CTk):
         self.left_option_menu.place(
             x=20,
             y=20
-        )
-
-        check_var = customtkinter.StringVar(value="False")
-        self.left_checkbox_search = customtkinter.CTkCheckBox(
-            self,
-            text="Search completed",
-            variable=check_var,
-            onvalue="True",
-            offvalue="False",
-            bg_color="black"
         )
 
         self.left_checkbox_search.place(
