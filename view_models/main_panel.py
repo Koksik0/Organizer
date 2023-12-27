@@ -2,7 +2,6 @@ import customtkinter
 from tkinter import CENTER
 from database.create_database import select_all_data
 from modules.main_panel_manager import AppManager
-from modules.main_panel_manager import all_id, all_descriptions, all_titles, all_deadlines, all_completed
 
 
 class App(customtkinter.CTk):
@@ -63,11 +62,11 @@ class App(customtkinter.CTk):
         # All data
         self.current_id = None
         self.tasks = select_all_data(self.left_checkbox_search.get())
-        self.ids = all_id(self.tasks)
-        self.titles = all_titles(self.tasks)
-        self.descriptions = all_descriptions(self.tasks)
-        self.deadlines = all_deadlines(self.tasks)
-        self.completed = all_completed(self.tasks)
+        self.ids = self.data_manager.all_id(self.tasks)
+        self.titles = self.data_manager.all_titles(self.tasks)
+        self.descriptions = self.data_manager.all_descriptions(self.tasks)
+        self.deadlines = self.data_manager.all_deadlines(self.tasks)
+        self.completed = self.data_manager.all_completed(self.tasks)
 
         self.left_option_menu = customtkinter.CTkOptionMenu(
             self,
@@ -75,7 +74,8 @@ class App(customtkinter.CTk):
             anchor=CENTER,
             width=300,
             dropdown_fg_color='gray',
-            dropdown_hover_color='green'
+            dropdown_hover_color='green',
+            dynamic_resizing=False
         )
 
         self.left_option_menu.place(
@@ -198,6 +198,7 @@ class App(customtkinter.CTk):
         self.left_option_menu.configure(variable=self.option_menu_var)
         self.option_menu_var.trace_add('write', self.data_manager.update)
 
+        # Right site
         self.right_title = customtkinter.CTkLabel(
             self,
             text="Title: ",
@@ -275,3 +276,5 @@ class App(customtkinter.CTk):
             x=875,
             y=650
         )
+
+        self.data_manager.first_occurrence()
