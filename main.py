@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from database.create_database import initialize_database
 from view_models.main_panel import App
 

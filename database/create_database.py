@@ -37,7 +37,7 @@ def select_all_data(checkbox):
     session = Session()
     try:
         tasks = None
-        if checkbox=="False":
+        if checkbox == "False":
             checkbox = 0
             tasks = session.query(Tasks).where(Tasks.completed == checkbox).order_by(Tasks.due_date)
         else:
