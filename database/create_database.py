@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, Column, Integer, String, DATE, BOOLEAN, up
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('sqlite:///database/database.db', echo=True)
+engine = create_engine('sqlite:////home/pawel/Pulpit/Organizer/database/database.db', echo=True)
 
 Base = declarative_base()
 
